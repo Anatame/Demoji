@@ -8,7 +8,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
+import android.view.accessibility.AccessibilityWindowInfo
 import com.anatame.crazyapp.MessageData
 
 
@@ -32,8 +32,22 @@ class AccessibilityKeyDetector : AccessibilityService() {
                     )
                     viewsToCheck?.performAction(AccessibilityAction.ACTION_SET_TEXT.id, arguments)
                 }
+
+                isKeyboardOpened()
             }
         }
+    }
+
+    fun isKeyboardOpened(): Boolean {
+        val windowInfoList = windows
+        for (k in windowInfoList.indices) {
+            if (windowInfoList[k].type == AccessibilityWindowInfo.TYPE_INPUT_METHOD) {
+                Log.i("keyBoardStatus", "keyboard is opened!")
+                println("keyboard is opened!")
+                return true
+            }
+        }
+        return false
     }
 
 
