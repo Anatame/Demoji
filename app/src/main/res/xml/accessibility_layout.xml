@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service
+    android:accessibilityEventTypes="typeViewClicked|typeWindowContentChanged"
+    android:accessibilityFeedbackType="feedbackAllMask"
+    android:notificationTimeout="100"
+    android:canRetrieveWindowContent="true"
+    android:settingsActivity=""
+    android:packageNames="com.discord"
+    android:canRequestFilterKeyEvents="true"
+    android:accessibilityFlags="flagRetrieveInteractiveWindows"
+    xmlns:android="http://schemas.android.com/apk/res/android" />
