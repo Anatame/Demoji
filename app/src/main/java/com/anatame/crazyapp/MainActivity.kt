@@ -3,7 +3,10 @@ package com.anatame.crazyapp
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.anatame.crazyapp.databinding.ActivityMainBinding
 import com.anatame.crazyapp.services.ForegroundService
@@ -12,6 +15,7 @@ import com.anatame.crazyapp.services.ForegroundService
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -19,12 +23,17 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnSetMessage.setOnClickListener {
             val message = binding.etSetMessage.text.toString()
-            MessageData.message = message
+            CommonData.message = message
             binding.tvCurrentText.text = message
         }
 
         checkOverlayPermission()
         startService()
+
+    }
+
+    fun closeEmoteMenu(){
+        println("MessageFromActivity: close emote menu")
     }
 
     // method for starting the service

@@ -1,10 +1,12 @@
 package com.anatame.crazyapp
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Build
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 
 
 class Window(  // declaring required variables
@@ -14,7 +16,26 @@ class Window(  // declaring required variables
     private var mParams: WindowManager.LayoutParams? = null
     private val mWindowManager: WindowManager
     private val layoutInflater: LayoutInflater
+
+    private lateinit var titleText: TextView
+
     fun open() {
+
+        CommonData.emoteMenuStatus = {
+            when(it){
+                EmoteMenu.Closed -> {
+                    println("From foreground: EMOTE MENU CLOSED")
+                    titleText.text = "CLOSED"
+                    titleText.setTextColor(Color.RED);
+                }
+                EmoteMenu.Open -> {
+                    println("From foreground: EMOTE MENU OPEN")
+                    titleText.text = "OPEN"
+                    titleText.setTextColor(Color.GREEN);
+                }
+            }
+        }
+
         try {
             // check if the view is already
             // inflated or present in the window
@@ -68,5 +89,7 @@ class Window(  // declaring required variables
         // window within the screen
         mParams!!.gravity = Gravity.CENTER
         mWindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
+        titleText = mView.findViewById<TextView>(R.id.titleText)
     }
 }

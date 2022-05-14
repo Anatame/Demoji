@@ -9,7 +9,8 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeInfo.AccessibilityAction
 import android.view.accessibility.AccessibilityWindowInfo
-import com.anatame.crazyapp.MessageData
+import com.anatame.crazyapp.CommonData
+import com.anatame.crazyapp.EmoteMenu
 
 
 class AccessibilityKeyDetector : AccessibilityService() {
@@ -21,20 +22,21 @@ class AccessibilityKeyDetector : AccessibilityService() {
 
         when(event.eventType){
             AccessibilityEvent.TYPE_VIEW_CLICKED -> {
-                if (event.source.contentDescription == "Toggle emoji keyboard") {
+                event.source?.let{
+                    if (event.source.contentDescription == "Toggle emoji keyboard") {
+                        tray = null
 
-                    tray = null
+                        val eventPackageName = event.packageName
+                        val className = event.className
+                        val source: AccessibilityNodeInfo? = event.source
+                        val targetAppPackageName = "com.discord"
+                        val targetViewId = "text_input"
+                        val viewsToCheck =
+                            rootInActiveWindow?.findAccessibilityNodeInfosByViewId("$targetAppPackageName:id/$targetViewId")
+                                ?.getOrNull(0)
 
-                    val eventPackageName = event.packageName
-                    val className = event.className
-                    val source: AccessibilityNodeInfo? = event.source
-                    val targetAppPackageName = "com.discord"
-                    val targetViewId = "text_input"
-                    val viewsToCheck =
-                        rootInActiveWindow?.findAccessibilityNodeInfosByViewId("$targetAppPackageName:id/$targetViewId")
-                            ?.getOrNull(0)
-
-                    pasteText(viewsToCheck)
+                        pasteText(viewsToCheck)
+                    }
                 }
             }
 
@@ -66,10 +68,12 @@ class AccessibilityKeyDetector : AccessibilityService() {
 
     fun closeEmoteMenu(){
         println("Emote Menu has been Closed")
+        CommonData.emoteMenuStatus(EmoteMenu.Closed)
     }
 
     fun showEmoteMenu(){
         println("Emote Menu is now Open")
+        CommonData.emoteMenuStatus(EmoteMenu.Open)
     }
 
 
@@ -77,7 +81,7 @@ class AccessibilityKeyDetector : AccessibilityService() {
         val arguments = Bundle()
         arguments.putCharSequence(
             AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
-            MessageData.message
+            CommonData.message
         )
         viewsToCheck?.performAction(AccessibilityAction.ACTION_SET_TEXT.id, arguments)
     }
