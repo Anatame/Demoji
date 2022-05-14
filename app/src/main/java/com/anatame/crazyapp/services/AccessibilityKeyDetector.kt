@@ -13,29 +13,73 @@ import com.anatame.crazyapp.MessageData
 
 
 class AccessibilityKeyDetector : AccessibilityService() {
+
+    var isEmoteMenuVisible: Boolean = false
+    var tray: AccessibilityNodeInfo? = null
+
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
 
         when(event.eventType){
             AccessibilityEvent.TYPE_VIEW_CLICKED -> {
-                if(event.source.contentDescription == "Toggle emoji keyboard"){
+                if (event.source.contentDescription == "Toggle emoji keyboard") {
+
+                    tray = null
+
                     val eventPackageName = event.packageName
                     val className = event.className
                     val source: AccessibilityNodeInfo? = event.source
                     val targetAppPackageName = "com.discord"
                     val targetViewId = "text_input"
-                    val viewsToCheck = rootInActiveWindow?.findAccessibilityNodeInfosByViewId("$targetAppPackageName:id/$targetViewId")?.getOrNull(0)
+                    val viewsToCheck =
+                        rootInActiveWindow?.findAccessibilityNodeInfosByViewId("$targetAppPackageName:id/$targetViewId")
+                            ?.getOrNull(0)
 
-                    val arguments = Bundle()
-                    arguments.putCharSequence(
-                        AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
-                        MessageData.message
-                    )
-                    viewsToCheck?.performAction(AccessibilityAction.ACTION_SET_TEXT.id, arguments)
+                    pasteText(viewsToCheck)
                 }
+            }
 
-                isKeyboardOpened()
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                handleEmoteMenu()
             }
         }
+    }
+
+    private fun handleEmoteMenu() {
+        if (tray == null) {
+            tray =
+                rootInActiveWindow?.findAccessibilityNodeInfosByViewId("com.discord:id/expression_tray_container")
+                    ?.getOrNull(0)
+            if (tray == null) {
+                if (isEmoteMenuVisible) {
+                    println("Tray is closed")
+                    closeEmoteMenu()
+                    isEmoteMenuVisible = false
+                }
+            } else {
+                println(tray)
+                showEmoteMenu()
+                isEmoteMenuVisible = true
+            }
+        }
+    }
+
+
+    fun closeEmoteMenu(){
+        println("Emote Menu has been Closed")
+    }
+
+    fun showEmoteMenu(){
+        println("Emote Menu is now Open")
+    }
+
+
+    private fun pasteText(viewsToCheck: AccessibilityNodeInfo?) {
+        val arguments = Bundle()
+        arguments.putCharSequence(
+            AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,
+            MessageData.message
+        )
+        viewsToCheck?.performAction(AccessibilityAction.ACTION_SET_TEXT.id, arguments)
     }
 
     fun isKeyboardOpened(): Boolean {
